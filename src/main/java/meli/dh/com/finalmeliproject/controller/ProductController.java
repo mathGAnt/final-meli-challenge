@@ -3,6 +3,8 @@ package meli.dh.com.finalmeliproject.controller;
 import com.sun.istack.Nullable;
 import meli.dh.com.finalmeliproject.dto.ProductBatchDTO;
 
+import meli.dh.com.finalmeliproject.dto.ProductDTO;
+import meli.dh.com.finalmeliproject.dto.ProductFilterDTO;
 import meli.dh.com.finalmeliproject.dto.ProductsBatchFilter;
 import meli.dh.com.finalmeliproject.dto.shoppingCart.RequestShoppingCartDto;
 import meli.dh.com.finalmeliproject.dto.shoppingCart.ResponseShoppingCartDto;
@@ -20,7 +22,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/fresh-products")
@@ -97,4 +101,38 @@ public class ProductController {
     public ResponseEntity<List<Batch>> findByBatchsDueDate(@RequestParam @Nullable int amountDay, String categoryName) {
         return new ResponseEntity<>(batchService.findByDueDate(categoryName, amountDay), HttpStatus.OK);
     }
+
+    @GetMapping("/by-category/order-by")
+    public ResponseEntity<List<ProductFilterDTO>> listingProductsByCategoryOrderingByPrice (@RequestParam String category, String order){
+        List<ProductFilterDTO> productList;
+        switch(order){
+            case "asc":
+                productList = productService.filterByCategoryAndOrderByPriceASC(category);
+                break;
+            case "desc":
+                productList = productService.filterByCategoryAndOrderByPriceDESC(category);
+                break;
+            default:
+                productList = productService.findProductsByCategory(category).stream().map(ProductFilterDTO::new).collect(Collectors.toList());
+        }
+
+        return ResponseEntity.ok().body(productList);
+    }
+
+    @GetMapping("/by-category/price-range")
+    public ResponseEntity<List<ProductFilterDTO>> listingProductsByCategoryWithPriceRange (@RequestParam String category, double minPrice, double maxPrice){
+        return ResponseEntity.ok().body(productService.findAllProductsByCategoryWithPriceRange(category, minPrice, maxPrice));
+    }
+
+    @GetMapping("/order-by")
+    public ResponseEntity<List<ProductFilterDTO>> findProductsListAndOrderByPrice(@RequestParam String option){
+        return ResponseEntity.ok().body(productService.findAllProductsAndOrderByPrice(option));
+    }
+
+    @GetMapping("/price-range")
+    public ResponseEntity<List<ProductFilterDTO>> listingAllProductsWithPriceRange (@RequestParam double minPrice, double maxPrice){
+        return ResponseEntity.ok().body(productService.findAllProductsByPriceRange(minPrice, maxPrice));
+    }
+
+
 }
