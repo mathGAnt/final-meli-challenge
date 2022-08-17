@@ -1,6 +1,8 @@
 package meli.dh.com.finalmeliproject.service.product;
 
 import meli.dh.com.finalmeliproject.dto.ProductBatchDTO;
+import meli.dh.com.finalmeliproject.dto.ProductDTO;
+import meli.dh.com.finalmeliproject.dto.ProductFilterDTO;
 import meli.dh.com.finalmeliproject.dto.ProductsBatchFilter;
 import meli.dh.com.finalmeliproject.exception.BadRequestExceptionImp;
 import meli.dh.com.finalmeliproject.exception.NotFoundExceptionImp;
@@ -84,19 +86,18 @@ public class ProductService implements IProductService {
     }
 
     public List<Product> filterProductsByBatch (String productId, String order){
-        repo.findById(productId);
+        Product product = repo.findById(productId);
 
         switch (order) {
             case "B":
                 return repo.findAll()
-                        .stream()
-                        .sorted((b1, b2) -> b1.compareToBatch(b2))
+                        .stream().filter(p -> p.getName().equals(product.getName()))
                         .collect(Collectors.toList());
             case "Q":
-                return repo.findAll()
-                        .stream()
-                        .sorted()
-                        .collect(Collectors.toList());
+                //return repo.findBy(productId)
+                  //      .stream().filter(p -> wareHouseProductRepo.findByProductId(p.getId()).getQuantity())
+                    //    .sorted()
+                      //  .collect(Collectors.toList());
                 // TODO: fazer query para pegar a quantidade
             case "D":
                 return repo.findAll()
@@ -130,4 +131,53 @@ public class ProductService implements IProductService {
         return productsBatchFilters;
     }
 
+    //Feature 6
+
+    @Override
+    public List<ProductFilterDTO> filterByCategoryAndOrderByPriceASC(String category){
+        List<Product> productList = findProductsByCategory(category);
+        return productList.stream()
+                .sorted((p1, p2) -> Double.compare(p1.getPrice(), p2.getPrice()))
+                .collect(Collectors.toList()).stream().map(ProductFilterDTO::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductFilterDTO> filterByCategoryAndOrderByPriceDESC(String category){
+        List<Product> productList = findProductsByCategory(category);
+        return productList.stream()
+                .sorted((p1, p2) -> Double.compare(p2.getPrice(), p1.getPrice()))
+                .collect(Collectors.toList()).stream().map(ProductFilterDTO::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductFilterDTO> findAllProductsByCategoryWithPriceRange(String category, double minPrice, double maxPrice){
+        List<Product> productList = findProductsByCategory(category);
+        return productList.stream().filter(p -> (p.getPrice() >= minPrice && p.getPrice() <= maxPrice))
+                .sorted((p1, p2) -> Double.compare(p1.getPrice(), p2.getPrice()) )
+                .collect(Collectors.toList()).stream().map(ProductFilterDTO::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductFilterDTO> findAllProductsAndOrderByPrice(String option) {
+        List<Product> productList = findAllProducts();
+        if(option.equals("asc")){
+            return productList.stream()
+                    .sorted((p1, p2) -> Double.compare(p1.getPrice(), p2.getPrice()))
+                    .collect(Collectors.toList()).stream().map(ProductFilterDTO::new).collect(Collectors.toList());
+        }else if(option.equals("desc")){
+            return productList.stream()
+                    .sorted((p1, p2) -> Double.compare(p2.getPrice(), p1.getPrice()))
+                    .collect(Collectors.toList()).stream().map(ProductFilterDTO::new).collect(Collectors.toList());
+        }else{
+            throw new BadRequestExceptionImp("Order not found");
+        }
+    }
+
+    @Override
+    public List<ProductFilterDTO> findAllProductsByPriceRange(double minPrice, double maxPrice) {
+        List<Product> productList = findAllProducts();
+        return productList.stream().filter(p -> (p.getPrice() >= minPrice && p.getPrice() <= maxPrice))
+                .sorted((p1, p2) -> Double.compare(p1.getPrice(), p2.getPrice()) )
+                .collect(Collectors.toList()).stream().map(ProductFilterDTO::new).collect(Collectors.toList());
+    }
 }
