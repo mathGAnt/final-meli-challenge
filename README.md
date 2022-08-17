@@ -15,7 +15,7 @@ how the transportation works.
 - [Requirement 4](https://drive.google.com/file/d/1SrnMYVTWpxL5HgHr5jArLyVDmf28fSKs/view)
 - [Requirement 5](https://drive.google.com/file/d/1dBNsi0F46esQLiosD8GCjxmDn7cB_Gvu/view)
 - [Requirement 6](https://drive.google.com/file/d/1yIORCyoLOG5TmyX-7O-K13e0q70NfwQx/view)
-- (Requeriment 6 story: https://docs.google.com/document/d/1lJAkan1WPkgNHrT91V0u-5osaUo9yCvO/edit?usp=sharing&ouid=107936978996894086874&rtpof=true&sd=true)
+- [(Requeriment 6 story)](https://docs.google.com/document/d/1lJAkan1WPkgNHrT91V0u-5osaUo9yCvO/edit?usp=sharing&ouid=107936978996894086874&rtpof=true&sd=true)
 
 ## Authors
 
